@@ -1,0 +1,21 @@
+name: Deployment Pipeline
+on : 
+- push
+- workflow_dispatch
+
+jobs:
+  log_to_console:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4 # git clone
+
+      - name: Docker compose pull
+        run: docker-compose pull
+      - name: Docker compose down
+        run: docker-compose down
+
+      - name: Docker compose up
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+        run: docker-compose up -d --build --remove-orphans
