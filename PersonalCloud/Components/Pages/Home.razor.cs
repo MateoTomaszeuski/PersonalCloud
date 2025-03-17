@@ -31,7 +31,7 @@ public partial class Home
 
     private void RefreshMedia()
     {
-        mediaList = MediaService.GetAllMedia().ToList();
+        mediaList = MediaService.GetAllMedia().OrderBy(media => Path.GetFileName(media)).ToList();
         selectedMedia = mediaList.ToDictionary(media => media, media => false);
     }
 
