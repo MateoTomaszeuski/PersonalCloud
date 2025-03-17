@@ -4,7 +4,7 @@ on :
 - workflow_dispatch
 
 jobs:
-  log_to_console:
+  deploy:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4 # git clone

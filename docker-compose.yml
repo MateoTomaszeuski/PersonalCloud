@@ -6,3 +6,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8080:8080
+    volumes:
+      - media-data:/app/wwwroot/media
+      - albums-data:/app/wwwroot/albums
+
+volumes:
+  media-data:
+  albums-data:
