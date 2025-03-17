@@ -1,0 +1,71 @@
+﻿@page "/"
+@inject IMediaService MediaService
+
+<h3 class="page-title">All Media</h3>
+
+@if (selectedMedia.Values.Any(selected => selected))
+{
+    <button @onclick="DeleteSelectedMedia" class="global-delete-button">Delete Selected</button>
+}
+
+<div class="media-container">
+    @foreach (var mediaPath in mediaList)
+    {
+        <div class="media-item">
+            <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
+            @if (IsImage(mediaPath))
+            {
+                <img src="@mediaPath" alt="Media Preview" class="media-preview" />
+            }
+            else if (IsVideo(mediaPath))
+            {
+                <video controls class="media-preview">
+                    <source src="@mediaPath" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+            }
+        </div>
+    }
+</div>
+
+
+@code {
+    private List<string> mediaList = new();
+    private Dictionary<string, bool> selectedMedia = new();
+
+    private bool IsImage(string filePath) =>
+        filePath.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+        filePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+        filePath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase);
+
+    private bool IsVideo(string filePath) =>
+        filePath.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
+        filePath.EndsWith(".mov", StringComparison.OrdinalIgnoreCase) ||
+        filePath.EndsWith(".avi", StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnInitialized()
+    {
+        RefreshMedia();
+    }
+
+    private void RefreshMedia()
+    {
+        mediaList = MediaService.GetAllMedia().ToList();
+        selectedMedia = mediaList.ToDictionary(media => media, media => false);
+    }
+
+    private void DeleteSelectedMedia()
+    {
+        var filesToDelete = selectedMedia
+            .Where(kv => kv.Value)
+            .Select(kv => Path.GetFileName(kv.Key))
+            .ToList();
+
+        foreach (var fileName in filesToDelete)
+        {
+            MediaService.DeleteMedia(fileName);
+        }
+
+        RefreshMedia();
+    }
+}

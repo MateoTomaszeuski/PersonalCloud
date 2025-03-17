@@ -1,0 +1,94 @@
+﻿@page "/upload"
+@inject IMediaService MediaService
+
+<h3>Upload Media</h3>
+
+<!-- File input allows multiple files to be selected -->
+<InputFile @ref="inputFile" OnChange="OnFilesSelected" multiple="true" />
+
+<!-- Upload button enabled after at least one file is selected -->
+<button class="btn btn-primary" @onclick="UploadMedia" disabled="@(files.Count == 0 || isUploading)">Upload</button>
+
+<p>@(files.Count > 0 ? $"{files.Count} file(s) selected." : "No files selected.")</p>
+
+@if (isUploading)
+{
+    <div class="progress-bar-container">
+        <div class="progress-bar" style="width: @(uploadProgress)%"></div>
+    </div>
+    <p>Uploading... @(uploadProgress)%</p>
+}
+
+@if (!string.IsNullOrEmpty(uploadMessage))
+{
+    <div class="alert alert-success">@uploadMessage</div>
+}
+
+<style>
+    .progress-bar-container {
+        width: 100%;
+        height: 20px;
+        background-color: #f3f3f3;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #4caf50;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+
+    .alert {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+</style>
+
+@code {
+    private List<IBrowserFile> files = new();
+    private InputFile inputFile;
+    private bool isUploading = false;
+    private int uploadProgress = 0;
+    private string uploadMessage = string.Empty;
+
+    private void OnFilesSelected(InputFileChangeEventArgs e)
+    {
+        files = e.GetMultipleFiles().ToList();
+        uploadMessage = string.Empty; // Clear old message
+    }
+
+    private async Task UploadMedia()
+    {
+        if (files.Count == 0)
+            return;
+
+        isUploading = true;
+        uploadProgress = 0;
+        uploadMessage = string.Empty;
+
+        int totalFiles = files.Count;
+        int uploadedFiles = 0;
+        List<string> uploadedFileNames = new();
+
+        foreach (var file in files)
+        {
+            await MediaService.UploadMedia(file);
+            uploadedFiles++;
+            uploadProgress = (int)((uploadedFiles / (double)totalFiles) * 100);
+            uploadedFileNames.Add(file.Name);
+            StateHasChanged();
+        }
+
+        // Reset after upload
+        files.Clear();
+        await Task.Delay(300); // Small delay for smooth UX
+        isUploading = false;
+        uploadProgress = 0;
+        uploadMessage = $"Uploaded files: {string.Join(", ", uploadedFileNames)}";
+
+        StateHasChanged();
+    }
+}

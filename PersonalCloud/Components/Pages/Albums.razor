@@ -1,0 +1,39 @@
+﻿@page "/albums"
+@inject IMediaService MediaService
+
+<h3>Albums</h3>
+<input @bind="newAlbumName" placeholder="New Album Name" />
+<button @onclick="CreateAlbum">Create Album</button>
+<ul>
+    @foreach (var album in albumList)
+    {
+        <li>
+            <a href="/album/@album">@album</a>
+        </li>
+    }
+</ul>
+
+@code {
+    private List<string> albumList = new List<string>();
+    private string newAlbumName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        RefreshAlbums();
+    }
+
+    private void RefreshAlbums()
+    {
+        albumList = MediaService.GetAlbums().ToList();
+    }
+
+    private void CreateAlbum()
+    {
+        if (!string.IsNullOrWhiteSpace(newAlbumName))
+        {
+            MediaService.CreateAlbum(newAlbumName);
+            newAlbumName = string.Empty;
+            RefreshAlbums();
+        }
+    }
+}
