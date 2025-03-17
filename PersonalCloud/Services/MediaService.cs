@@ -66,6 +66,7 @@ namespace PersonalCloud.Services
             var d = Directory.GetFiles(mediaFolder).Select(file => Path.Combine("media", Path.GetFileName(file)));
             return d;
         }
+        
 
         public void DeleteMedia(string fileName)
         {
