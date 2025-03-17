@@ -41,7 +41,7 @@
 }
 
 .media-preview {
-    height: 250px;
+    height: auto;
     width: 100%;
     object-fit: cover;
     border-radius: 6px;
@@ -118,9 +118,5 @@
     .global-delete-button {
         font-size: 0.95rem;
         padding: 8px 12px;
-    }
-
-    .media-preview {
-        height: 180px;
     }
 }
