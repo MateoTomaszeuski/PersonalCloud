@@ -7,8 +7,8 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - media-data:/app/wwwroot/media
-      - albums-data:/app/wwwroot/albums
+      - ./media/songs:/app/wwwroot/media
+      - ./media/albums:/app/wwwroot/albums
 
 volumes:
   media-data:

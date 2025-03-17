@@ -9,10 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4 # git clone
 
-      - name: Docker compose pull
-        run: docker-compose pull
       - name: Docker compose down
         run: docker-compose down 
 
       - name: Docker compose up
-        run: docker-compose up -d --build --no-recreate  --remove-orphans
+        run: docker-compose up -d --build
