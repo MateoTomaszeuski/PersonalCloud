@@ -19,7 +19,7 @@
             <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
             @if (IsImage(mediaPath))
             {
-                <img src="@mediaPath" alt="Media Preview" class="media-preview" />
+                <img src="@mediaPath" alt="Media Preview" class="media-preview" @onclick="() => ShowFullImage(mediaPath)" />
             }
             else if (IsVideo(mediaPath))
             {
@@ -32,9 +32,19 @@
     }
 </div>
 
+@if (!string.IsNullOrEmpty(fullImagePath))
+{
+    <div class="modal" @onclick="CloseFullImage">
+        <div class="modal-content">
+            <img src="@fullImagePath" class="full-image" />
+        </div>
+    </div>
+}
+
 @code {
     private List<string> mediaList = new();
     private Dictionary<string, bool> selectedMedia = new();
+    private string? fullImagePath;
 
     private bool IsImage(string filePath) =>
         filePath.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
@@ -83,4 +93,13 @@
         await JSRuntime.InvokeVoidAsync("downloadFile", zipRelativePath);
     }
 
+    private void ShowFullImage(string imagePath)
+    {
+        fullImagePath = imagePath;
+    }
+
+    private void CloseFullImage()
+    {
+        fullImagePath = null;
+    }
 }
