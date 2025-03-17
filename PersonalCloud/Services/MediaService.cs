@@ -7,108 +7,126 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PersonalCloud.Services;
-public class MediaService : IMediaService
+namespace PersonalCloud.Services
 {
-    private readonly string mediaFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "media");
-    private readonly string albumsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "albums");
-
-    public MediaService()
+    public class MediaService : IMediaService
     {
-        // Ensure the media and albums folders exist in wwwroot
-        if (!Directory.Exists(mediaFolder)) Directory.CreateDirectory(mediaFolder);
-        if (!Directory.Exists(albumsFolder)) Directory.CreateDirectory(albumsFolder);
-    }
+        private readonly string mediaFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "media");
+        private readonly string albumsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "albums");
 
-    public string CreateZipFromFiles(List<string> fileNames, string zipName)
-    {
-        var zipPath = Path.Combine("wwwroot", "downloads", zipName);
-        Directory.CreateDirectory(Path.GetDirectoryName(zipPath)!);
-
-        using (var archive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+        public MediaService()
         {
-            foreach (var file in fileNames)
+            // Ensure the media and albums folders exist in wwwroot
+            if (!Directory.Exists(mediaFolder)) Directory.CreateDirectory(mediaFolder);
+            if (!Directory.Exists(albumsFolder)) Directory.CreateDirectory(albumsFolder);
+        }
+
+        public string CreateZipFromFiles(List<string> fileNames, string zipName)
+        {
+            var zipPath = Path.Combine("wwwroot", "downloads", zipName);
+            Directory.CreateDirectory(Path.GetDirectoryName(zipPath)!);
+
+            using (var archive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
             {
-                var fullPath = Path.Combine("wwwroot", "media", file);
-                if (File.Exists(fullPath))
+                foreach (var file in fileNames)
                 {
-                    archive.CreateEntryFromFile(fullPath, file);
+                    var fullPath = Path.Combine("wwwroot", "media", file);
+                    if (File.Exists(fullPath))
+                    {
+                        archive.CreateEntryFromFile(fullPath, file);
+                    }
                 }
             }
+
+            // Schedule deletion of the ZIP file
+            _ = DeleteZipAfterDelay(zipPath, TimeSpan.FromMinutes(5));
+
+            return $"/downloads/{zipName}";
         }
 
-        // Schedule deletion of the ZIP file
-        _ = DeleteZipAfterDelay(zipPath, TimeSpan.FromMinutes(5));
-
-        return $"/downloads/{zipName}";
-    }
-
-    private async Task DeleteZipAfterDelay(string zipPath, TimeSpan delay)
-    {
-        await Task.Delay(delay);
-        try
+        private async Task DeleteZipAfterDelay(string zipPath, TimeSpan delay)
         {
-            if (File.Exists(zipPath))
+            await Task.Delay(delay);
+            try
             {
-                File.Delete(zipPath);
-                Console.WriteLine($"Deleted temporary ZIP file: {zipPath}");
+                if (File.Exists(zipPath))
+                {
+                    File.Delete(zipPath);
+                    Console.WriteLine($"Deleted temporary ZIP file: {zipPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting ZIP file: {ex.Message}");
             }
         }
-        catch (Exception ex)
+
+        public IEnumerable<string> GetAllMedia()
         {
-            Console.WriteLine($"Error deleting ZIP file: {ex.Message}");
+            var d = Directory.GetFiles(mediaFolder).Select(file => Path.Combine("media", Path.GetFileName(file)));
+            return d;
         }
-    }
 
-    public IEnumerable<string> GetAllMedia()
-    {
-        var d = Directory.GetFiles(mediaFolder).Select(file => Path.Combine("media", Path.GetFileName(file)));
-        return d;
-    }
-
-    public void DeleteMedia(string fileName)
-    {
-        var filePath = Path.Combine(mediaFolder, fileName);
-        try
+        public void DeleteMedia(string fileName)
         {
-
-            if (File.Exists(filePath)) File.Delete(filePath);
+            var filePath = Path.Combine(mediaFolder, fileName);
+            try
+            {
+                if (File.Exists(filePath)) File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting file: {ex.Message}");
+            }
         }
-        catch (Exception ex)
+
+        public async Task UploadMedia(IBrowserFile file)
         {
-            Console.WriteLine($"Error deleting file: {ex.Message}");
+            var filePath = Path.Combine(mediaFolder, file.Name);
+            await using FileStream fs = new FileStream(filePath, FileMode.Create);
+            await file.OpenReadStream(long.MaxValue).CopyToAsync(fs);
         }
-    }
 
-    public async Task UploadMedia(IBrowserFile file)
-    {
-        var filePath = Path.Combine(mediaFolder, file.Name);
-        await using FileStream fs = new FileStream(filePath, FileMode.Create);
-        await file.OpenReadStream(long.MaxValue).CopyToAsync(fs);
-    }
+        public IEnumerable<string> GetAlbums()
+        {
+            return Directory.GetDirectories(albumsFolder).Select(Path.GetFileName);
+        }
 
-    public IEnumerable<string> GetAlbums()
-    {
-        return Directory.GetDirectories(albumsFolder).Select(Path.GetFileName);
-    }
+        public void CreateAlbum(string albumName)
+        {
+            var albumPath = Path.Combine(albumsFolder, albumName);
+            if (!Directory.Exists(albumPath)) Directory.CreateDirectory(albumPath);
+        }
 
-    public void CreateAlbum(string albumName)
-    {
-        var albumPath = Path.Combine(albumsFolder, albumName);
-        if (!Directory.Exists(albumPath)) Directory.CreateDirectory(albumPath);
-    }
+        public IEnumerable<string> GetAlbumMedia(string albumName)
+        {
+            var albumPath = Path.Combine(albumsFolder, albumName);
+            return Directory.Exists(albumPath) ? Directory.GetFiles(albumPath).Select(Path.GetFileName) : new List<string>();
+        }
 
-    public IEnumerable<string> GetAlbumMedia(string albumName)
-    {
-        var albumPath = Path.Combine(albumsFolder, albumName);
-        return Directory.Exists(albumPath) ? Directory.GetFiles(albumPath).Select(Path.GetFileName) : new List<string>();
-    }
+        public void AddMediaToAlbum(string albumName, string fileName)
+        {
+            var albumPath = Path.Combine(albumsFolder, albumName);
+            var sourcePath = Path.Combine(mediaFolder, fileName);
+            var destinationPath = Path.Combine(albumPath, fileName);
+            if (File.Exists(sourcePath) && !File.Exists(destinationPath)) File.Copy(sourcePath, destinationPath);
+        }
 
-    public void AddMediaToAlbum(string albumName, string fileName)
-    {
-        var albumPath = Path.Combine(albumsFolder, albumName);
-        var sourcePath = Path.Combine(mediaFolder, fileName);
-        var destinationPath = Path.Combine(albumPath, fileName);
-        if (File.Exists(sourcePath) && !File.Exists(destinationPath)) File.Copy(sourcePath, destinationPath);
+        // New method to get the storage usage percentage
+        public double GetStorageUsagePercentage()
+        {
+            // Get the drive information for the directory where media and albums are stored
+            var driveInfo = new DriveInfo(Path.GetPathRoot(Directory.GetCurrentDirectory()));
+
+            // Get total and available space
+            long totalSpace = driveInfo.TotalSize;
+            long availableSpace = driveInfo.AvailableFreeSpace;
+
+            // Calculate used space and the percentage of usage
+            long usedSpace = totalSpace - availableSpace;
+            double usagePercentage = (double)usedSpace / totalSpace * 100;
+
+            return usagePercentage;
+        }
     }
 }

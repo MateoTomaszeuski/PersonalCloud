@@ -1,0 +1,40 @@
+@page "/storage-usage"
+@inject PersonalCloud.Services.IMediaService MediaService
+
+<h3>Storage Usage</h3>
+
+<div>
+    <p>Total Storage Capacity: @TotalCapacityFormatted GB</p>
+    <p>Storage Used: @UsedCapacityFormatted GB</p>
+    <p>Storage Available: @AvailableCapacityFormatted GB</p>
+</div>
+
+<div class="storage-bar-container">
+    <div class="storage-bar-background">
+        <div class="storage-bar-fill" style="width: @usagePercentage%"></div>
+    </div>
+</div>
+
+<p>@usagePercentage% of storage is in use.</p>
+
+@code {
+    private double usagePercentage;
+    private string TotalCapacityFormatted => (TotalCapacity / (1024 * 1024 * 1024)).ToString("0.##");
+    private string UsedCapacityFormatted => (UsedCapacity / (1024 * 1024 * 1024)).ToString("0.##");
+    private string AvailableCapacityFormatted => (AvailableCapacity / (1024 * 1024 * 1024)).ToString("0.##");
+
+    private long TotalCapacity { get; set; }
+    private long UsedCapacity { get; set; }
+    private long AvailableCapacity { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var driveInfo = new System.IO.DriveInfo(System.IO.Path.GetPathRoot(System.IO.Directory.GetCurrentDirectory()));
+
+        TotalCapacity = driveInfo.TotalSize;
+        AvailableCapacity = driveInfo.AvailableFreeSpace;
+        UsedCapacity = TotalCapacity - AvailableCapacity;
+
+        usagePercentage = (double)UsedCapacity / TotalCapacity * 100;
+    }
+}
