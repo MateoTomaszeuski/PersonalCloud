@@ -5,6 +5,7 @@ namespace PersonalCloud.Services
     public interface IMediaService
     {
         void AddMediaToAlbum(string albumName, string fileName);
+        string CreateZipFromFiles(List<string> fileNames, string zipName);
         void CreateAlbum(string albumName);
         void DeleteMedia(string fileName);
         IEnumerable<string> GetAlbumMedia(string albumName);

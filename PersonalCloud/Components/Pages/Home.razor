@@ -75,9 +75,12 @@
     private async Task DownloadSelectedMedia()
     {
         var selectedPaths = selectedMedia.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
-        foreach (var path in selectedPaths)
-        {
-            await JSRuntime.InvokeVoidAsync("downloadFile", path);
-        }
+        var fileNames = selectedPaths.Select(Path.GetFileName).ToList();
+
+        var zipName = $"media_{DateTime.Now:yyyyMMdd_HHmmss}.zip";
+        var zipRelativePath = MediaService.CreateZipFromFiles(fileNames, zipName);
+
+        await JSRuntime.InvokeVoidAsync("downloadFile", zipRelativePath);
     }
+
 }

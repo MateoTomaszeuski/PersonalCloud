@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,46 @@ public class MediaService : IMediaService
         // Ensure the media and albums folders exist in wwwroot
         if (!Directory.Exists(mediaFolder)) Directory.CreateDirectory(mediaFolder);
         if (!Directory.Exists(albumsFolder)) Directory.CreateDirectory(albumsFolder);
+    }
+
+    public string CreateZipFromFiles(List<string> fileNames, string zipName)
+    {
+        var zipPath = Path.Combine("wwwroot", "downloads", zipName);
+        Directory.CreateDirectory(Path.GetDirectoryName(zipPath)!);
+
+        using (var archive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+        {
+            foreach (var file in fileNames)
+            {
+                var fullPath = Path.Combine("wwwroot", "media", file);
+                if (File.Exists(fullPath))
+                {
+                    archive.CreateEntryFromFile(fullPath, file);
+                }
+            }
+        }
+
+        // Schedule deletion of the ZIP file
+        _ = DeleteZipAfterDelay(zipPath, TimeSpan.FromMinutes(5));
+
+        return $"/downloads/{zipName}";
+    }
+
+    private async Task DeleteZipAfterDelay(string zipPath, TimeSpan delay)
+    {
+        await Task.Delay(delay);
+        try
+        {
+            if (File.Exists(zipPath))
+            {
+                File.Delete(zipPath);
+                Console.WriteLine($"Deleted temporary ZIP file: {zipPath}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting ZIP file: {ex.Message}");
+        }
     }
 
     public IEnumerable<string> GetAllMedia()
