@@ -54,6 +54,31 @@
     margin-bottom: 5px;
 }
 
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.download-button {
+    padding: 10px 16px;
+    background-color: #1d3557;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+    .download-button:hover {
+        background-color: #16324f;
+    }
+
+
+
 /* Responsive Adjustments */
 @media (max-width: 600px) {
     .page-title {

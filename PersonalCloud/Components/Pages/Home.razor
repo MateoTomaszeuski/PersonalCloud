@@ -1,11 +1,15 @@
 ﻿@page "/"
 @inject IMediaService MediaService
+@inject IJSRuntime JSRuntime
 
 <h3 class="page-title">All Media</h3>
 
 @if (selectedMedia.Values.Any(selected => selected))
 {
-    <button @onclick="DeleteSelectedMedia" class="global-delete-button">Delete Selected</button>
+    <div class="action-buttons">
+        <button @onclick="DeleteSelectedMedia" class="global-delete-button">Delete Selected</button>
+        <button @onclick="DownloadSelectedMedia" class="download-button">Download Selected</button>
+    </div>
 }
 
 <div class="media-container">
@@ -27,7 +31,6 @@
         </div>
     }
 </div>
-
 
 @code {
     private List<string> mediaList = new();
@@ -67,5 +70,14 @@
         }
 
         RefreshMedia();
+    }
+
+    private async Task DownloadSelectedMedia()
+    {
+        var selectedPaths = selectedMedia.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
+        foreach (var path in selectedPaths)
+        {
+            await JSRuntime.InvokeVoidAsync("downloadFile", path);
+        }
     }
 }
