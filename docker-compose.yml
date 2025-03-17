@@ -7,11 +7,5 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - media-data:/app/wwwroot/media
-      - albums-data:/app/wwwroot/albums
-      
-volumes:
-  media-data:
-    external: true
-  albums-data:
-    external: true
+      - ./media-data:/app/publish/wwwroot/media
+      - ./albums-data:/app/publish/wwwroot/albums
