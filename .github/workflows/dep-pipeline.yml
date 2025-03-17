@@ -12,7 +12,7 @@ jobs:
       - name: Docker compose pull
         run: docker-compose pull
       - name: Docker compose down
-        run: docker-compose down --volumes
+        run: docker-compose down 
 
       - name: Docker compose up
         run: docker-compose up -d --build --remove-orphans
