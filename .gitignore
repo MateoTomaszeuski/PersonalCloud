@@ -5,7 +5,7 @@
 ./edia-data/
 ./albums-data/
 ./downloads/
-
+./data/
 
 # User-specific files
 *.rsuser
