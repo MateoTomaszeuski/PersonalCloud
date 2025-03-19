@@ -92,12 +92,13 @@
     }
     
     .modal-content {
-        max-width: 90%;
-        max-height: 90%;
+        width: auto;
+        height: 90%;
         overflow: hidden;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: transparent;
     }
     
     .full-image {
