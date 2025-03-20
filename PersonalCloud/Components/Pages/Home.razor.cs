@@ -19,7 +19,7 @@ public partial class Home
         filePath.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
         filePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
         filePath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-        filePath.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) 
+        filePath.EndsWith(".heic", StringComparison.OrdinalIgnoreCase)
         ;
 
     private bool IsVideo(string filePath) =>
@@ -33,12 +33,15 @@ public partial class Home
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-{
-    if (firstRender)
     {
-        await JSRuntime.InvokeVoidAsync("initLazyLoading");
+        Console.WriteLine("OnAfterRenderAsync triggered");
+        Console.WriteLine(firstRender);
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("console.log", "Blazor is calling initLazyLoading");
+            await JSRuntime.InvokeVoidAsync("window.initLazyLoading");
+        }
     }
-}
     private async Task LoadMediaAsync()
     {
         var m = await MediaService.GetAllMediaAsync();

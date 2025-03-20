@@ -132,12 +132,14 @@ video {
 
 /* Responsive Adjustments */
 @media (max-width: 600px) {
-    .page-title {
-        font-size: 1.5rem;
+    .media-container {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     }
-
-    .global-delete-button {
-        font-size: 0.95rem;
-        padding: 8px 12px;
+    .media-preview {
+        height: 120px; /* Reduce preview size */
+    }
+    .modal-content {
+        width: 95%;
+        height: auto;
     }
 }

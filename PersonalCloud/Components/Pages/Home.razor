@@ -8,29 +8,32 @@
         <button @onclick="DownloadSelectedMedia" class="download-button">Download Selected</button>
     </div>
 }
-
 <div class="media-container">
-    @foreach (var mediaPath in mediaList)
-    {
-        <div class="media-item">
-            <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
-            @if (IsImage(mediaPath))
-            {
-                <img data-src="@mediaPath" alt="@("Media Preview: "+ mediaPath)" class="media-preview lazy" 
-                     @onclick="() => ShowFullImage(mediaPath)" />
-            }
-            else if (IsVideo(mediaPath))
-            {
-                <video controls class="media-preview lazy-video" preload="none" muted>
-                    <source data-src="@mediaPath" type="video/mp4" />
-                    Your browser does not support the video tag.
-                </video>
-            }
-            else{
-                @mediaPath
-            }
-        </div>
-    }
+    <Virtualize Items="@mediaList">
+        <ItemContent Context="mediaPath">
+
+            <div class="media-item">
+                <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
+                @if (IsImage(mediaPath))
+                {
+                    <img data-src="@mediaPath" alt="@("Media Preview: " + mediaPath)" class="media-preview lazy"
+                        @onclick="() => ShowFullImage(mediaPath)" />
+                }
+                else if (IsVideo(mediaPath))
+                {
+                    <video controls class="media-preview lazy-video" preload="none" muted>
+                        <source data-src="@mediaPath" type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                }
+                else
+                {
+                    @mediaPath
+                }
+            </div>
+
+        </ItemContent>
+    </Virtualize>
 </div>
 
 @if (!string.IsNullOrEmpty(fullImagePath))
