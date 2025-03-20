@@ -8,9 +8,9 @@ namespace PersonalCloud.Components.Pages;
 public partial class Home
 {
     [Inject]
-    public IJSRuntime JSRuntime {get; set;}
+    public IJSRuntime JSRuntime { get; set; }
     [Inject]
-    public IMediaService MediaService {get;set;}
+    public IMediaService MediaService { get; set; }
     private List<string> mediaList = new();
     private Dictionary<string, bool> selectedMedia = new();
     private string? fullImagePath;
@@ -25,28 +25,41 @@ public partial class Home
         filePath.EndsWith(".mov", StringComparison.OrdinalIgnoreCase) ||
         filePath.EndsWith(".avi", StringComparison.OrdinalIgnoreCase);
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        RefreshMedia();
+        await LoadMediaAsync();
     }
-private int pageSize = 20;
-private async ValueTask<ItemsProviderResult<string>> LoadMedia(ItemsProviderRequest request)
-{
-    var mediaSubset = mediaList.Skip(request.StartIndex).Take(pageSize).ToList();
-    return new ItemsProviderResult<string>(mediaSubset, mediaList.Count);
-}
 
-private string GetThumbnailPath(string fullPath)
-{
-    return MediaService.GetThumbnail(fullPath); // Generates a smaller version
-}
-private async ValueTask<ItemsProviderResult<string>> LoadMediaItems(ItemsProviderRequest request)
-{
-    var itemsToLoad = mediaList.Skip(request.StartIndex).Take(request.Count).ToList();
-    return new ItemsProviderResult<string>(itemsToLoad, mediaList.Count);
-}
+    private string? fullVideoPath;
+    private void LoadVideo(string videoPath)
+    {
+        fullVideoPath = videoPath;
+    }
+    private async Task LoadMediaAsync()
+    {
+        var m = await MediaService.GetAllMediaAsync(); 
+        mediaList = m.ToList();
+        selectedMedia = mediaList.ToDictionary(media => media, media => false);
+        StateHasChanged();
+    }
 
+    private int pageSize = 20;
+    private async ValueTask<ItemsProviderResult<string>> LoadMedia(ItemsProviderRequest request)
+    {
+        var mediaSubset = mediaList.Skip(request.StartIndex).Take(pageSize).ToList();
+        return new ItemsProviderResult<string>(mediaSubset, mediaList.Count);
+    }
 
+    private string GetThumbnailPath(string fullPath)
+    {
+        fullPath = "/app/publish/wwwroot/" + fullPath;
+        return MediaService.GetThumbnail(fullPath); // Generates a smaller version
+    }
+    private async ValueTask<ItemsProviderResult<string>> LoadMediaItems(ItemsProviderRequest request)
+    {
+        var itemsToLoad = mediaList.Skip(request.StartIndex).Take(request.Count).ToList();
+        return new ItemsProviderResult<string>(itemsToLoad, mediaList.Count);
+    }
     private void RefreshMedia()
     {
         mediaList = MediaService.GetAllMedia().OrderBy(media => Path.GetFileName(media)).ToList();
