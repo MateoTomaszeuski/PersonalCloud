@@ -79,27 +79,27 @@ public class MediaService : IMediaService
     }
 
     public async Task<string> CreateZipFromFiles(List<string> fileNames, string zipName)
-{
-    var tempZipPath = Path.Combine(Path.GetTempPath(), zipName);
-    using (var archive = ZipFile.Open(tempZipPath, ZipArchiveMode.Create))
     {
-        foreach (var fileName in fileNames)
+        var tempZipPath = Path.Combine(Path.GetTempPath(), zipName);
+        using (var archive = ZipFile.Open(tempZipPath, ZipArchiveMode.Create))
         {
-            var blobClient = _mediaContainerClient.GetBlobClient(fileName);
-            if (await blobClient.ExistsAsync())
+            foreach (var fileName in fileNames)
             {
-                var tempFile = Path.GetTempFileName();
-                await using (var tempFileStream = File.OpenWrite(tempFile))
+                var blobClient = _mediaContainerClient.GetBlobClient(fileName);
+                if (await blobClient.ExistsAsync())
                 {
-                    await blobClient.DownloadToAsync(tempFileStream);
+                    var tempFile = Path.GetTempFileName();
+                    await using (var tempFileStream = File.OpenWrite(tempFile))
+                    {
+                        await blobClient.DownloadToAsync(tempFileStream);
+                    }
+                    archive.CreateEntryFromFile(tempFile, fileName);
+                    File.Delete(tempFile);
                 }
-                archive.CreateEntryFromFile(tempFile, fileName);
-                File.Delete(tempFile);
             }
         }
+        return tempZipPath;
     }
-    return tempZipPath;
-}
 
     public async Task<string> GetThumbnailAsync(string fileName)
     {
@@ -197,6 +197,6 @@ public class MediaService : IMediaService
 
         Console.WriteLine("Migration completed!");
     }
-public BlobClient GetBlobClient(string fileName) => _mediaContainerClient.GetBlobClient(fileName);
+    public BlobClient GetBlobClient(string fileName) => _mediaContainerClient.GetBlobClient(fileName);
 
 }
