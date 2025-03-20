@@ -39,7 +39,8 @@ namespace PersonalCloud.Services
 
         public void DeleteMedia(string fileName)
         {
-            var filePath = Path.Combine(mediaFolder, fileName);
+            var filePath = Path.Combine("/app/publish/wwwroot/",mediaFolder, fileName);
+            Console.WriteLine($"delete file: {filePath}");
             try
             {
                 if (File.Exists(filePath))

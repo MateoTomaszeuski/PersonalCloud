@@ -10,7 +10,8 @@
 }
 
 <div class="media-container">
-    <Virtualize ItemsProvider="LoadMediaItems" Context="media">
+    @foreach (var media in mediaList)
+    {
         <div class="media-item">
             <input type="checkbox" class="media-checkbox" @bind="selectedMedia[media]" />
             @if (IsImage(media))
@@ -26,8 +27,7 @@
 
             }
         </div>
-    </Virtualize>
-
+    }
 </div>
 
 @if (!string.IsNullOrEmpty(fullImagePath))

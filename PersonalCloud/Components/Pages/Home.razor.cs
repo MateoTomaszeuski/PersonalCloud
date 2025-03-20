@@ -29,12 +29,6 @@ public partial class Home
     {
         await LoadMediaAsync();
     }
-
-    private string? fullVideoPath;
-    private void LoadVideo(string videoPath)
-    {
-        fullVideoPath = videoPath;
-    }
     private async Task LoadMediaAsync()
     {
         var m = await MediaService.GetAllMediaAsync(); 
@@ -42,29 +36,12 @@ public partial class Home
         selectedMedia = mediaList.ToDictionary(media => media, media => false);
         StateHasChanged();
     }
-
-    private int pageSize = 20;
-    private async ValueTask<ItemsProviderResult<string>> LoadMedia(ItemsProviderRequest request)
-    {
-        var mediaSubset = mediaList.Skip(request.StartIndex).Take(pageSize).ToList();
-        return new ItemsProviderResult<string>(mediaSubset, mediaList.Count);
-    }
-
-    private string GetThumbnailPath(string fullPath)
-    {
-        fullPath = "/app/publish/wwwroot/" + fullPath;
-        return MediaService.GetThumbnail(fullPath); // Generates a smaller version
-    }
     private async ValueTask<ItemsProviderResult<string>> LoadMediaItems(ItemsProviderRequest request)
-    {
-        var itemsToLoad = mediaList.Skip(request.StartIndex).Take(request.Count).ToList();
-        return new ItemsProviderResult<string>(itemsToLoad, mediaList.Count);
-    }
-    private void RefreshMedia()
-    {
-        mediaList = MediaService.GetAllMedia().OrderBy(media => Path.GetFileName(media)).ToList();
-        selectedMedia = mediaList.ToDictionary(media => media, media => false);
-    }
+{
+    Console.WriteLine($"Request: StartIndex={request.StartIndex}, Count={request.Count}");
+    var itemsToLoad = mediaList.Skip(request.StartIndex).Take(request.Count).ToList();
+    return new ItemsProviderResult<string>(itemsToLoad, mediaList.Count);
+}
 
     private void DeleteSelectedMedia()
     {
@@ -77,8 +54,6 @@ public partial class Home
         {
             MediaService.DeleteMedia(fileName);
         }
-
-        RefreshMedia();
     }
 
     private async Task DownloadSelectedMedia()
