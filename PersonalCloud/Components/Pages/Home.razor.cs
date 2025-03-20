@@ -29,20 +29,21 @@ public partial class Home
     {
         await LoadMediaAsync();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("initLazyLoading");
+    }
+}
     private async Task LoadMediaAsync()
     {
-        var m = await MediaService.GetAllMediaAsync(); 
+        var m = await MediaService.GetAllMediaAsync();
         mediaList = m.ToList();
         selectedMedia = mediaList.ToDictionary(media => media, media => false);
         StateHasChanged();
     }
-    private async ValueTask<ItemsProviderResult<string>> LoadMediaItems(ItemsProviderRequest request)
-{
-    Console.WriteLine($"Request: StartIndex={request.StartIndex}, Count={request.Count}");
-    var itemsToLoad = mediaList.Skip(request.StartIndex).Take(request.Count).ToList();
-    return new ItemsProviderResult<string>(itemsToLoad, mediaList.Count);
-}
-
     private void DeleteSelectedMedia()
     {
         var filesToDelete = selectedMedia

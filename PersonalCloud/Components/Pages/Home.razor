@@ -10,21 +10,21 @@
 }
 
 <div class="media-container">
-    @foreach (var media in mediaList)
+    @foreach (var mediaPath in mediaList)
     {
         <div class="media-item">
-            <input type="checkbox" class="media-checkbox" @bind="selectedMedia[media]" />
-            @if (IsImage(media))
+            <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
+            @if (IsImage(mediaPath))
             {
-                <img src="@media" alt="Media Preview" class="media-preview" @onclick="() => ShowFullImage(media)" />
+                <img data-src="@mediaPath" alt="Media Preview" class="media-preview lazy" 
+                     @onclick="() => ShowFullImage(mediaPath)" />
             }
-            else if (IsVideo(media))
+            else if (IsVideo(mediaPath))
             {
-                <video controls class="media-preview">
-                    <source src="@media" type="video/mp4" />
+                <video controls class="media-preview lazy-video" preload="none" muted>
+                    <source data-src="@mediaPath" type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
-
             }
         </div>
     }

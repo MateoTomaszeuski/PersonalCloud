@@ -6,19 +6,38 @@
     anchor.click();
     document.body.removeChild(anchor);
 };
+window.initLazyLoading = () => {
+    const images = document.querySelectorAll('img.lazy');
+    const videos = document.querySelectorAll('video.lazy-video');
 
-document.addEventListener("DOMContentLoaded", function () {
-    const lazyImages = document.querySelectorAll(".lazy-image");
-    
-    const observer = new IntersectionObserver(entries => {
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                let img = entry.target;
-                img.src = img.dataset.full;
-                observer.unobserve(img);
+                const el = entry.target;
+
+                // Handle image lazy loading
+                if (el.tagName === 'IMG' && el.dataset.src) {
+                    el.src = el.dataset.src;
+                    el.classList.remove('lazy');
+                    el.removeAttribute('data-src');
+                }
+
+                // Handle video lazy loading
+                if (el.tagName === 'VIDEO') {
+                    const source = el.querySelector('source');
+                    if (source && source.dataset.src) {
+                        source.src = source.dataset.src;
+                        el.load();
+                        el.classList.remove('lazy-video');
+                        source.removeAttribute('data-src');
+                    }
+                }
+
+                observer.unobserve(el);
             }
         });
-    }, { threshold: 0.3 });
+    });
 
-    lazyImages.forEach(img => observer.observe(img));
-});
+    images.forEach(img => observer.observe(img));
+    videos.forEach(video => observer.observe(video));
+};
