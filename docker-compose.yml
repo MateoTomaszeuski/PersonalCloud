@@ -1,6 +1,6 @@
 services:
   webapp:
-    container_name: webapp-mateo
+    container_name: PersonalCloud
     build:
       context: .
       dockerfile: Dockerfile

@@ -18,7 +18,9 @@ public partial class Home
     private bool IsImage(string filePath) =>
         filePath.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
         filePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-        filePath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase);
+        filePath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+        filePath.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) 
+        ;
 
     private bool IsVideo(string filePath) =>
         filePath.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
