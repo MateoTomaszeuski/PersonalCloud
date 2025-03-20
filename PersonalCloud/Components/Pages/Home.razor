@@ -16,7 +16,7 @@
             <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
             @if (IsImage(mediaPath))
             {
-                <img data-src="@mediaPath" alt="Media Preview" class="media-preview lazy" 
+                <img data-src="@mediaPath" alt="@("Media Preview: "+ mediaPath)" class="media-preview lazy" 
                      @onclick="() => ShowFullImage(mediaPath)" />
             }
             else if (IsVideo(mediaPath))
@@ -25,6 +25,9 @@
                     <source data-src="@mediaPath" type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
+            }
+            else{
+                @mediaPath
             }
         </div>
     }
