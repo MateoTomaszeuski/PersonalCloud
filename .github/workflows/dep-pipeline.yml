@@ -10,8 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4 # git clone
 
-      - name: Docker compose down
-        run: docker compose down --remove-orphans
-
       - name: Docker compose up
         run: docker compose up -d --build

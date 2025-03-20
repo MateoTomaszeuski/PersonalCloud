@@ -43,14 +43,17 @@
 .media-preview {
     width: 100%;
     height: 200px;
-    object-fit: cover;
-    background: #f0f0f0; /* Placeholder background */
+    object-fit: scale-down;
+    background: #f0f0f0;
+    /* Placeholder background */
     transition: opacity 0.3s ease-in-out;
-    opacity: 0; /* Initially hidden */
+    opacity: 0;
+    /* Initially hidden */
+    image-rendering: pixelated;
 }
 
 .media-preview.lazy {
-    opacity: 0; 
+    opacity: 0;
 }
 
 .media-preview:not(.lazy) {
@@ -135,9 +138,12 @@ video {
     .media-container {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     }
+
     .media-preview {
-        height: 120px; /* Reduce preview size */
+        height: 120px;
+        /* Reduce preview size */
     }
+
     .modal-content {
         width: 95%;
         height: auto;
