@@ -24,7 +24,7 @@ public partial class Home
 
     protected override async Task OnInitializedAsync()
     {
-        LoadMediaAsync();
+        await LoadMediaAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
