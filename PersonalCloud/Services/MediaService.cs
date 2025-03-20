@@ -66,7 +66,7 @@ namespace PersonalCloud.Services
             var d = Directory.GetFiles(mediaFolder).Select(file => Path.Combine("media", Path.GetFileName(file)));
             return d;
         }
-        
+
 
         public void DeleteMedia(string fileName)
         {
@@ -128,6 +128,30 @@ namespace PersonalCloud.Services
             double usagePercentage = (double)usedSpace / totalSpace * 100;
 
             return usagePercentage;
+        }
+        public string GetThumbnail(string fullPath)
+        {
+            // Generate or retrieve a low-resolution version of the image
+            var directory = Path.GetDirectoryName(fullPath);
+            var fileName = Path.GetFileNameWithoutExtension(fullPath);
+            var extension = Path.GetExtension(fullPath);
+
+            var thumbnailPath = Path.Combine(directory, "thumbnails", $"{fileName}_thumb{extension}");
+
+            // Check if the thumbnail exists; if not, create one
+            if (!File.Exists(thumbnailPath))
+            {
+                GenerateThumbnail(fullPath, thumbnailPath);
+            }
+
+            return thumbnailPath;
+        }
+
+        private void GenerateThumbnail(string originalPath, string thumbnailPath)
+        {
+            using var image = System.Drawing.Image.FromFile(originalPath);
+            var thumbnail = image.GetThumbnailImage(150, 150, () => false, IntPtr.Zero);
+            thumbnail.Save(thumbnailPath);
         }
     }
 }

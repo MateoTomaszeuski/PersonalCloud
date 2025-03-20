@@ -8,6 +8,8 @@ namespace PersonalCloud.Services
         string CreateZipFromFiles(List<string> fileNames, string zipName);
         void CreateAlbum(string albumName);
         void DeleteMedia(string fileName);
+
+        string GetThumbnail(string fullPath);
         IEnumerable<string> GetAlbumMedia(string albumName);
         IEnumerable<string> GetAlbums();
         IEnumerable<string> GetAllMedia();

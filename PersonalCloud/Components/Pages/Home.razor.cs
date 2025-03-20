@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using PersonalCloud.Services;
 
@@ -28,6 +29,23 @@ public partial class Home
     {
         RefreshMedia();
     }
+private int pageSize = 20;
+private async ValueTask<ItemsProviderResult<string>> LoadMedia(ItemsProviderRequest request)
+{
+    var mediaSubset = mediaList.Skip(request.StartIndex).Take(pageSize).ToList();
+    return new ItemsProviderResult<string>(mediaSubset, mediaList.Count);
+}
+
+private string GetThumbnailPath(string fullPath)
+{
+    return MediaService.GetThumbnail(fullPath); // Generates a smaller version
+}
+private async ValueTask<ItemsProviderResult<string>> LoadMediaItems(ItemsProviderRequest request)
+{
+    var itemsToLoad = mediaList.Skip(request.StartIndex).Take(request.Count).ToList();
+    return new ItemsProviderResult<string>(itemsToLoad, mediaList.Count);
+}
+
 
     private void RefreshMedia()
     {

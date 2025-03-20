@@ -10,4 +10,8 @@
     <Folder Include="wwwroot\downloads\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="9.0.3" />
+  </ItemGroup>
+
 </Project>

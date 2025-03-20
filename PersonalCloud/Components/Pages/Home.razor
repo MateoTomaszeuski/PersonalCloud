@@ -10,23 +10,22 @@
 }
 
 <div class="media-container">
-    @foreach (var mediaPath in mediaList)
-    {
+    <Virtualize ItemsProvider="LoadMediaItems" Context="media">
         <div class="media-item">
-            <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
-            @if (IsImage(mediaPath))
+            <input type="checkbox" class="media-checkbox" @bind="selectedMedia[media]" />
+            @if (IsImage(media))
             {
-                <img src="@mediaPath" alt="Media Preview" class="media-preview" @onclick="() => ShowFullImage(mediaPath)" />
+                <img src="@media" alt="Media Preview" class="media-preview" @onclick="() => ShowFullImage(media)" />
             }
-            else if (IsVideo(mediaPath))
+            else if (IsVideo(media))
             {
                 <video controls class="media-preview">
-                    <source src="@mediaPath" type="video/mp4" />
+                    <source src="@media" type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
             }
         </div>
-    }
+    </Virtualize>
 </div>
 
 @if (!string.IsNullOrEmpty(fullImagePath))
