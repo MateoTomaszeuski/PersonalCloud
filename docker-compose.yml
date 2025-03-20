@@ -9,3 +9,15 @@ services:
     volumes:
       - ~/Desktop/cloud-data:/app/publish/wwwroot/media
       - ~/Desktop/cloud-albums:/app/publish/wwwroot/albums
+    depends_on:
+      - azurite
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: azurite
+    ports:
+      - 10000:10000  # Blob storage
+      - 10001:10001
+      - 10002:10002
+    volumes:
+      - ~/Desktop/cloud-azurite:/data  # Persistent Azurite storage

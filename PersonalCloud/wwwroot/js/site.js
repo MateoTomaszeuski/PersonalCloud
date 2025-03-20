@@ -1,11 +1,11 @@
-﻿window.downloadFile = (url) => {
-    const anchor = document.createElement('a');
+﻿window.downloadFile = function (url) {
+    const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = '';
+    anchor.download = "";
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);
-};
+}
 window.initLazyLoading = () => {
     console.log("in lazyloading")
     const images = document.querySelectorAll('img.lazy');

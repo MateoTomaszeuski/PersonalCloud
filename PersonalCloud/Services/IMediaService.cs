@@ -1,18 +1,19 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Components.Forms;
 
-namespace PersonalCloud.Services
+namespace PersonalCloud.Services;
+
+public interface IMediaService
 {
-    public interface IMediaService
-    {
-        void AddMediaToAlbum(string albumName, string fileName);
-        string CreateZipFromFiles(List<string> fileNames, string zipName);
-        void CreateAlbum(string albumName);
-        void DeleteMedia(string fileName);
-        Task<IEnumerable<string>> GetAllMediaAsync();
-        string GetThumbnail(string fullPath);
-        IEnumerable<string> GetAlbumMedia(string albumName);
-        IEnumerable<string> GetAlbums();
-        IEnumerable<string> GetAllMedia();
-        Task UploadMedia(IBrowserFile file);
-    }
+    Task<string> CreateZipFromFiles(List<string> fileNames, string zipName);
+    Task DeleteMedia(string fileName);
+    Task<IEnumerable<string>> GetAllMediaAsync();
+    Task<string> GetThumbnailAsync(string fileName);
+    bool IsImage(string filePath);
+    bool IsVideo(string filePath);
+    Task UploadMedia(IBrowserFile file);
+    Task UploadToBlob(Action<int> progressCallback);
+    BlobClient GetBlobClient(string fileName);
+
 }
+

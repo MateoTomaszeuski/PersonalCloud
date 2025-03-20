@@ -9,6 +9,8 @@
 
 <p>@(files.Count > 0 ? $"{files.Count} file(s) selected." : "No files selected.")</p>
 
+<button class="btn btn-primary" @onclick="UploadMediaToBlob" disabled="@(isUploading)">Upload to Blob</button>
+
 @if (isUploading)
 {
     <div class="progress-bar-container">

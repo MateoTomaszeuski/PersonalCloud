@@ -15,7 +15,7 @@
             <input type="checkbox" class="media-checkbox" @bind="selectedMedia[mediaPath]" />
             @if (IsImage(mediaPath))
             {
-                <img data-src="@mediaPath" alt="@("Media Preview: " + mediaPath)" class="media-preview lazy"
+                <img data-src="@("/media/" + @Path.GetFileName(mediaPath))" alt="@("Media Preview: " + mediaPath)" class="media-preview lazy"
                     @onclick="() => ShowFullImage(mediaPath)" />
             }
             else if (IsVideo(mediaPath))
@@ -37,7 +37,7 @@
 {
     <div class="modal" @onclick="CloseFullImage">
         <div class="modal-content">
-            <img src="@fullImagePath" class="full-image" />
+            <img src="@("/media/" + @Path.GetFileName(fullImagePath))" class="full-image" />
         </div>
     </div>
 }

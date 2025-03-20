@@ -15,17 +15,12 @@ public partial class Home
     private Dictionary<string, bool> selectedMedia = new();
     private string? fullImagePath;
 
+
     private bool IsImage(string filePath) =>
-        filePath.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-        filePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-        filePath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-        filePath.EndsWith(".heic", StringComparison.OrdinalIgnoreCase)
-        ;
+        MediaService.IsImage(filePath);
 
     private bool IsVideo(string filePath) =>
-        filePath.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
-        filePath.EndsWith(".mov", StringComparison.OrdinalIgnoreCase) ||
-        filePath.EndsWith(".avi", StringComparison.OrdinalIgnoreCase);
+        MediaService.IsVideo(filePath);
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,17 +56,17 @@ public partial class Home
             MediaService.DeleteMedia(fileName);
         }
     }
+   private async Task DownloadSelectedMedia()
+{
+    var selectedPaths = selectedMedia.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
+    var fileNames = selectedPaths.Select(Path.GetFileName).ToList();
 
-    private async Task DownloadSelectedMedia()
-    {
-        var selectedPaths = selectedMedia.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
-        var fileNames = selectedPaths.Select(Path.GetFileName).ToList();
+    var zipName = $"media_{DateTime.Now:yyyyMMdd_HHmmss}.zip";
+    var zipPath = await MediaService.CreateZipFromFiles(fileNames, zipName);
 
-        var zipName = $"media_{DateTime.Now:yyyyMMdd_HHmmss}.zip";
-        var zipRelativePath = MediaService.CreateZipFromFiles(fileNames, zipName);
-
-        await JSRuntime.InvokeVoidAsync("downloadFile", zipRelativePath);
-    }
+    var downloadUrl = $"/download/{zipName}";
+    await JSRuntime.InvokeVoidAsync("downloadFile", downloadUrl);
+   }
 
     private void ShowFullImage(string imagePath)
     {

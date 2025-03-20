@@ -6,7 +6,7 @@ namespace PersonalCloud.Components.Pages;
 public partial class Upload
 {
     [Inject]
-    public IMediaService MediaService {get;set;}
+    public IMediaService MediaService { get; set; }
     private List<IBrowserFile> files = new();
     private InputFile inputFile;
     private bool isUploading = false;
@@ -48,6 +48,23 @@ public partial class Upload
         uploadProgress = 0;
         uploadMessage = $"Uploaded files: {string.Join(", ", uploadedFileNames)}";
 
+        StateHasChanged();
+    }
+
+    private async Task UploadMediaToBlob()
+    {
+        isUploading = true;
+        uploadProgress = 0;
+        uploadMessage = string.Empty;
+
+        await MediaService.UploadToBlob(progress =>
+        {
+            uploadProgress = progress;
+            StateHasChanged(); // Update UI in real-time
+        });
+
+        isUploading = false;
+        uploadMessage = "Upload to Blob completed!";
         StateHasChanged();
     }
 }
